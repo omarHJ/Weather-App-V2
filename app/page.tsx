@@ -33,26 +33,11 @@ export default function Home() {
   const [suggestions, setSuggestions] = useState<WeatherData[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
 
-  // Background images
-  const backgroundImages = [
-    "/village-2090495_1920.jpg",
-    "/nature-1959229_1920.jpg",
-    "/pexels-jplenio-3473659.jpg",
-    "/sunrise-1959227_1920.jpg",
-    "/Aurora_1920x1080.jpg",
-    "/forest-3776796_1920.jpg",
-  ];
-
-  const getRandomBackground = () => {
-    const randomIndex = Math.floor(Math.random() * backgroundImages.length);
-    return backgroundImages[randomIndex];
-  };
-
   useEffect(() => {
-    const randomBackground = getRandomBackground();
+    // Set the single background image directly in CSS
     document.documentElement.style.setProperty(
       "--random-bg",
-      `url(${randomBackground})`
+      "url('/nature-1959229_1920.jpg')"
     );
 
     if (navigator.geolocation) {
