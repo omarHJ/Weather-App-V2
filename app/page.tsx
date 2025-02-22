@@ -1,101 +1,199 @@
-import Image from "next/image";
+"use client";
+
+import { useState, useEffect } from "react";
+import axios from "axios";
+
+// Define types for the weather data
+interface WeatherData {
+  name?: string;
+  main?: {
+    temp: number;
+    feels_like: number;
+    humidity: number;
+  };
+  weather?: {
+    description: string;
+  }[];
+  wind?: {
+    speed: number;
+  };
+  coord?: {
+    lat: number;
+    lon: number;
+  };
+  sys?: {
+    country: string;
+  };
+}
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [location, setLocation] = useState<string>("");
+  const [data, setData] = useState<WeatherData>({});
+  const [error, setError] = useState<string | null>(null);
+  const [suggestions, setSuggestions] = useState<WeatherData[]>([]);
+  const [selectedIndex, setSelectedIndex] = useState<number>(-1);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  // Background images
+  const backgroundImages = [
+    "/village-2090495_1920.jpg",
+    "/nature-1959229_1920.jpg",
+    "/pexels-jplenio-3473659.jpg",
+    "/sunrise-1959227_1920.jpg",
+    "/Aurora_1920x1080.jpg",
+    "/forest-3776796_1920.jpg",
+  ];
+
+  const getRandomBackground = () => {
+    const randomIndex = Math.floor(Math.random() * backgroundImages.length);
+    return backgroundImages[randomIndex];
+  };
+
+  useEffect(() => {
+    const randomBackground = getRandomBackground();
+    document.documentElement.style.setProperty(
+      "--random-bg",
+      `url(${randomBackground})`
+    );
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          fetchWeatherByCoordinates(latitude, longitude);
+        },
+        (err) => {
+          setError(
+            "Could not retrieve location. Please try to search your location."
+          );
+        }
+      );
+    } else {
+      setError("Geolocation is not supported by this browser.");
+    }
+  }, []);
+
+  const fetchWeatherByCoordinates = async (lat: number, lon: number) => {
+    try {
+      const res = await axios.get(`/api/weather?lat=${lat}&lon=${lon}`);
+      setData(res.data);
+      setError(null);
+      setSuggestions([]);
+    } catch (err) {
+      setError("Failed to fetch weather data");
+    }
+  };
+
+  const handleInputChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const userInput = e.target.value;
+    setLocation(userInput);
+
+    if (userInput.length > 2) {
+      try {
+        const response = await axios.get(`/api/weather?q=${userInput}`);
+        setSuggestions(response.data.list || []);
+      } catch (err) {
+        setSuggestions([]);
+      }
+    } else {
+      setSuggestions([]);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "ArrowDown") {
+      setSelectedIndex((prevIndex) =>
+        Math.min(prevIndex + 1, suggestions.length - 1)
+      );
+    } else if (e.key === "ArrowUp") {
+      setSelectedIndex((prevIndex) => Math.max(prevIndex - 1, 0));
+    } else if (e.key === "Enter" && selectedIndex >= 0) {
+      handleCitySelect(suggestions[selectedIndex]);
+    }
+  };
+
+  const handleCitySelect = (city: WeatherData) => {
+    setLocation(city.name || "");
+    if (city.coord) {
+      fetchWeatherByCoordinates(city.coord.lat, city.coord.lon);
+    }
+    setSuggestions([]);
+    setSelectedIndex(-1);
+  };
+
+  return (
+    <div className="app">
+      <div className="search">
+        <input
+          value={location}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
+          placeholder="Enter Location"
+          type="text"
+        />
+      </div>
+
+      {error && !data.name && <p>{error}</p>}
+
+      {suggestions.length > 0 && (
+        <div className="suggestions-dropdown">
+          {suggestions.map((city, index) => (
+            <div
+              key={index}
+              className={`suggestion-item ${
+                selectedIndex === index ? "selected" : ""
+              }`}
+              onClick={() => handleCitySelect(city)}
+            >
+              {city.name}, {city.sys?.country}
+            </div>
+          ))}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      )}
+
+      <div className="container">
+        <div className="top">
+          <div>
+            <div className="location">{data.name && <p>{data.name}</p>}</div>
+            <div className="temp">
+              {data.main && (
+                <h1>
+                  {data.main.temp.toFixed()}{" "}
+                  <small>
+                    <sup>&deg;C</sup>
+                  </small>
+                </h1>
+              )}
+            </div>
+          </div>
+          <div className="description">
+            {data.weather && <p>{data.weather[0]?.description}</p>}
+          </div>
+        </div>
+
+        <div className="bottom">
+          <div className="feels">
+            {data.main && (
+              <p>
+                {data.main.feels_like.toFixed()}{" "}
+                <small>
+                  <sup>&deg;C</sup>
+                </small>
+              </p>
+            )}
+            <p>Feels</p>
+          </div>
+          <div className="humidity">
+            {data.main && <p>{data.main.humidity}</p>}
+            <p>Humidity</p>
+          </div>
+          <div className="wind">
+            {data.wind && <p>{data.wind.speed} KPH</p>}
+            <p>Wind</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
