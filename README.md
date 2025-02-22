@@ -1,4 +1,4 @@
-# Weather App
+# [Weather App](https://weather-app-v2-kappa.vercel.app/)
 
 A Next.js weather application that fetches real-time weather data using the OpenWeatherMap API. The app features client-side interactivity, server-side API routes for security, rate limiting to prevent abuse, and optional authentication for protected access. The app uses TypeScript for type safety and global CSS for styling.
 
