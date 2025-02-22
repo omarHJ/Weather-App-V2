@@ -1,8 +1,6 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
 import { RateLimiterMemory } from "rate-limiter-flexible";
-
 
 const rateLimiter = new RateLimiterMemory({
   points: 10, // Number of requests allowed
@@ -18,7 +16,7 @@ export async function GET(request: NextRequest) {
   // Get the client's IP address
   const ip =
     request.headers.get("x-forwarded-for")?.split(",")[0] ||
-    request.ip ||
+    request.headers.get("x-real-ip") ||
     "unknown";
 
   try {
