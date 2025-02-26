@@ -31,12 +31,8 @@ A Next.js weather application that fetches real-time weather data using the Open
 - Fetches real-time weather data based on geolocation or user input.
 - Displays temperature, feels-like temperature, humidity, wind speed, and weather description.
 - Provides city suggestions as the user types (autocomplete).
-- Random background images for visual appeal.
 - Server-side API routes to hide the OpenWeatherMap API key.
 - Rate limiting to prevent abuse (10 requests per minute per IP).
-- Optional authentication for protected API access.
-- TypeScript for type safety and improved development experience.
-- Global CSS for consistent styling.
 
 ---
 
