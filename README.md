@@ -109,16 +109,12 @@ weather-app/
    ```
 
    - `WEATHER_API_KEY`: Your OpenWeatherMap API key (server-side only).
-   - `INTERNAL_API_KEY`: Secret key for server-side authentication (optional).
-   - `NEXT_PUBLIC_INTERNAL_API_KEY`: Public key for client-side authentication (optional).
 
    **Important:** Do not commit `.env.local` to version control. Ensure it is listed in `.gitignore`.
 
 ### Environment Variables
 
 - `WEATHER_API_KEY`: Used in `app/api/weather/route.ts` for server-side API calls. Must not have the `NEXT_PUBLIC_` prefix to remain server-side only.
-- `INTERNAL_API_KEY`: Used for server-side authentication (optional). Must not have the `NEXT_PUBLIC_` prefix.
-- `NEXT_PUBLIC_INTERNAL_API_KEY`: Used for client-side authentication (optional). Must have the `NEXT_PUBLIC_` prefix to be available in the client-side bundle.
 
 ### Running the App
 
@@ -132,6 +128,12 @@ weather-app/
    - Allow geolocation to fetch weather data for your current location.
    - Search for a city to see weather details and suggestions.
    - Trigger rate limiting by making more than 10 requests in 1 minute (should return a 429 status).
+
+### Docker Setup
+
+1. Build and run with Docker Compose:
+   ```bash
+   docker-compose up --build
 
 ---
 
@@ -159,13 +161,6 @@ weather-app/
 - Exceeding the limit returns a 429 status with the message "Too many requests. Please try again later."
 - Uses in-memory storage (`RateLimiterMemory`) for development. For production, consider using Redis for distributed rate limiting.
 
-### Authentication
-
-- Optional authentication is implemented using an internal API key.
-- The server-side API route checks for the `Authorization` header with a Bearer token matching `INTERNAL_API_KEY`.
-- The client-side code includes the `NEXT_PUBLIC_INTERNAL_API_KEY` in requests to `/api/weather`.
-- Unauthorized requests return a 401 status with the message "Unauthorized."
-
 ---
 
 ## Deployment
@@ -174,8 +169,6 @@ weather-app/
 
 1. Set environment variables in your hosting provider's dashboard (e.g., Vercel, Netlify):
    - `WEATHER_API_KEY`: Your OpenWeatherMap API key.
-   - `INTERNAL_API_KEY`: Secret key for authentication (optional).
-   - `NEXT_PUBLIC_INTERNAL_API_KEY`: Public key for client-side authentication (optional).
 2. Do not commit `.env.local` to version control. Use hosting provider settings instead.
 
 ### Testing in Production
@@ -214,11 +207,3 @@ weather-app/
 5. Open a pull request with a detailed description.
 
 ---
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
----
-
-This README is specific to your weather app and covers all aspects of setup, usage, security, and deployment. Make sure to create a `LICENSE` file if you choose to include licensing information. Let me know if you need further customization or additional sections!
