@@ -38,7 +38,7 @@ A Next.js weather application that fetches real-time weather data using the Open
 
 ## Technologies
 
-- **Next.js 14** (App Router) - Framework for React with server-side rendering and API routes.
+- **Next.js 15** (App Router) - Framework for React with server-side rendering and API routes.
 - **TypeScript** - Static typing for JavaScript.
 - **Axios** - HTTP client for making API requests.
 - **rate-limiter-flexible** - Rate limiting library for API protection.
@@ -64,7 +64,7 @@ weather-app/
 │   ├── nature-1959229_1920.jpg
 │   ├── pexels-jplenio-3473659.jpg
 │   └── sunrise-1959227_1920.jpg  # Background images
-├── .env.local                   # Environment variables (not committed)
+├── .env.local                   # Environment variables 
 ├── .gitignore                   # Git ignore file
 ├── package.json                 # Dependencies and scripts
 ├── tsconfig.json                # TypeScript configuration
@@ -96,7 +96,7 @@ weather-app/
    npm install
    ```
 
-3. Create a `.env.local` file in the root directory:
+3. Modify the `.env.local` file in the root directory:
 
    ```env
    WEATHER_API_KEY=your-openweathermap-api-key
@@ -136,7 +136,6 @@ weather-app/
 - **Geolocation:** On first load, the app requests geolocation access to fetch weather data for your current location.
 - **Search:** Enter a city name in the search bar to fetch weather data. Suggestions appear after typing 3 or more characters.
 - **Weather Display:** View temperature, feels-like temperature, humidity, wind speed, and weather description.
-- **Background Images:** Random background images are displayed on each page load.
 
 ---
 
@@ -170,8 +169,7 @@ weather-app/
 1. Deploy the app to your hosting provider (e.g., Vercel, Netlify).
 2. Test weather data fetching and suggestions.
 3. Verify rate limiting by making multiple requests (should return 429 after 10 requests in 1 minute).
-4. Verify authentication by removing the `Authorization` header (should return 401 if enabled).
-5. Inspect network requests to ensure the OpenWeatherMap API key is not exposed.
+4. Inspect network requests to ensure the OpenWeatherMap API key is not exposed.
 
 ---
 
@@ -183,21 +181,8 @@ weather-app/
 - **Rate Limiting Not Working:**
   - Verify `rate-limiter-flexible` is installed and configured in `app/api/weather/route.ts`.
   - For production, consider using Redis for distributed rate limiting.
-- **Authentication Errors:**
-  - Ensure `INTERNAL_API_KEY` and `NEXT_PUBLIC_INTERNAL_API_KEY` are set correctly.
-  - Check the `Authorization` header in client-side requests.
 - **Styles Not Applied:**
   - Ensure `globals.css` is imported in `app/layout.tsx`.
   - Verify class names in `page.tsx` match those in `globals.css`.
 
----
 
-## Contributing
-
-1. Fork the repository.
-2. Create a new branch: `git checkout -b feature/your-feature`.
-3. Make changes and commit: `git commit -m "Add your feature"`.
-4. Push to your fork: `git push origin feature/your-feature`.
-5. Open a pull request with a detailed description.
-
----
