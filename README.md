@@ -104,8 +104,6 @@ weather-app/
 
    ```env
    WEATHER_API_KEY=your-openweathermap-api-key
-   INTERNAL_API_KEY=your-secret-internal-key
-   NEXT_PUBLIC_INTERNAL_API_KEY=your-public-internal-key
    ```
 
    - `WEATHER_API_KEY`: Your OpenWeatherMap API key (server-side only).
